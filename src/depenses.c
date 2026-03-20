@@ -22,3 +22,20 @@ void ajouter_depense(sqlite3 *db, Depense *d){
     sqlite3_step(stmt);
     sqlite3_finalize(stmt);
 }
+sqlite3_stmt* charger_depense_stmt(sqlite3 *db, Depense *depenses){
+    sqlite3_stmt *stmt;
+    int nb=0;
+    sqlite3_prepare_v2(db, "select * from depenses where id = ?", -1, &stmt, NULL);
+    while (sqlite3_step(stmt) == SQLITE_ROW){
+        depenses[nb]
+        depenses[nb].id = sqlite3_column_int(stmt, 0);
+        depenses[nb].description = (char*)sqlite3_column_text(stmt, 1);
+        depenses[nb].categorie = (char*)sqlite3_column_text(stmt, 2);
+        depenses[nb].montant = sqlite3_column_double(stmt, 3);  
+        depenses[nb].date = (char*)sqlite3_column_text(stmt, 4);
+        nb++;
+    }
+    sqlite3_finalize(stmt);
+    return nb;
+}
+    
