@@ -5,6 +5,7 @@
 sqlite3 *ouvrir_db() {
     sqlite3 *db;
 sqlite3_open("depenses.db", &db);
+sqlite3_exec (db, "CREATE TABLE IF NOT EXISTS budget (id INTEGER PRIMARY KEY, montant REAL)", NULL, NULL, NULL);
 sqlite3_exec(db, "CREATE TABLE IF NOT EXISTS depenses (id INTEGER PRIMARY KEY AUTOINCREMENT, description TEXT, categorie TEXT, montant REAL, date TEXT)", NULL, NULL, NULL);
 return db;
 }
@@ -52,4 +53,27 @@ float total_par_categorie(sqlite3 *db, const char *categorie){
     float total = sqlite3_column_double(stmt, 0);
     sqlite3_finalize(stmt);
     return total;
+}
+float total_du_mois(sqlite3 *db ){
+    sqlite3_stmt *stmt;
+    sqlite3_prepare_v2(db, "select sum(montant) from depenses where strftime('%Y-%m', date) = strftime('%Y-%m', 'now')", -1, &stmt, NULL);
+    sqlite3_step(stmt);
+    float total = sqlite3_column_double(stmt, 0);
+    sqlite3_finalize(stmt);
+    return total;
+}
+void definir_budget(sqlite3 *db, float budget){
+    sqlite3_stmt *stmt;
+    sqlite3_prepare_v2(db, "insert or replace into budget (id, montant) values (1, ?)", -1, &stmt, NULL);
+    sqlite3_bind_double(stmt, 1, budget);
+    sqlite3_step(stmt);
+    sqlite3_finalize(stmt);
+}
+float get_budget(sqlite3 *db ){
+    sqlite3_stmt *stmt;
+    sqlite3_prepare_v2(db, "select montant from budget where id = 1", -1, &stmt, NULL);
+    sqlite3_step(stmt);
+    float budget = sqlite3_column_double(stmt, 0);
+    sqlite3_finalize(stmt);
+    return budget;
 }
