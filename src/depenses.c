@@ -37,4 +37,19 @@ int charger_depenses(sqlite3 *db, Depense *depenses){
     sqlite3_finalize(stmt);
     return nb;
 }
-    
+void supprimer_depense(sqlite3 *db, int id){
+    sqlite3_stmt *stmt;
+    sqlite3_prepare_v2(db, "delete from depenses where id = ?", -1, &stmt, NULL);
+    sqlite3_bind_int(stmt, 1, id);
+    sqlite3_step(stmt);
+    sqlite3_finalize(stmt);
+}
+float total_par_categorie(sqlite3 *db, const char *categorie){
+    sqlite3_stmt *stmt;
+    sqlite3_prepare_v2(db, "select sum(montant) from depenses where categorie = ?", -1, &stmt, NULL);
+    sqlite3_bind_text(stmt, 1, categorie, -1, SQLITE_STATIC);
+    sqlite3_step(stmt);
+    float total = sqlite3_column_double(stmt, 0);
+    sqlite3_finalize(stmt);
+    return total;
+}
